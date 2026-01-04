@@ -1,0 +1,34 @@
+{
+  "test_cases": [
+    {
+      "id": 1,
+      "question": "What is the capital of France?",
+      "actual_output": "The capital of France is Paris.",
+      "expected_output": "Paris is the capital and most populous city of France.",
+      "retrieval_context": [
+        "Paris is the capital and most populous city of France, located on the Seine River.",
+        "France is a country in Western Europe with Paris as its capital city."
+      ]
+    },
+    {
+      "id": 2,
+      "question": "What wood is best to grow for sale according to forestry experts?",
+      "actual_output": "Oak and walnut are considered excellent choices for timber production due to their high market value and durability.",
+      "expected_output": "Hardwoods like oak, walnut, and cherry are recommended for commercial timber production.",
+      "retrieval_context": [
+        "Oak and walnut trees are highly valued in the timber market for their strength and beautiful grain patterns.",
+        "Commercial forestry typically focuses on hardwood species that command premium prices."
+      ]
+    },
+    {
+      "id": 3,
+      "question": "Explain machine learning in simple terms.",
+      "actual_output": "Machine learning is a type of artificial intelligence that allows computers to learn from data and improve their performance over time without being explicitly programmed.",
+      "expected_output": "Machine learning enables computers to learn patterns from data and make predictions or decisions automatically.",
+      "retrieval_context": [
+        "Machine learning is a subset of AI focused on building systems that learn from data.",
+        "Unlike traditional programming, ML systems improve through experience with data."
+      ]
+    }
+  ]
+}
