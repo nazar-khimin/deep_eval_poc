@@ -30,7 +30,12 @@ wheels/
 .pytest_cache/
 .coverage
 htmlcov/
+.deepeval/
 
 # Environment
 .env
 .env.local
+
+# Poetry
+.venv/
+poetry.toml

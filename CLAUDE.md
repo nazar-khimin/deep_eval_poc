@@ -9,8 +9,11 @@ This is a proof-of-concept repository for testing DeepEval, a framework for eval
 ## Development Setup
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies using Poetry
+poetry install
+
+# Activate the virtual environment
+poetry shell
 
 # Set OpenAI API key (required for DeepEval metrics)
 export OPENAI_API_KEY="your-api-key"
@@ -20,13 +23,13 @@ export OPENAI_API_KEY="your-api-key"
 
 ```bash
 # Run all tests directly
-python main.py
+poetry run python main.py
 
 # Run tests with pytest
-pytest main.py -v
+poetry run pytest main.py -v
 
 # Run a specific test function
-pytest main.py::test_answer_relevancy -v
+poetry run pytest main.py::test_answer_relevancy -v
 ```
 
 ## Architecture
