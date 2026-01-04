@@ -13,6 +13,12 @@ deep_eval_poc/
 │   ├── single_turn_example.py    # Runnable single-turn examples
 │   ├── data/                     # Sample test data
 │   └── README.md                 # Playground documentation
+├── migration_pilot/              # Migration validation pilot
+│   ├── run_pilot.py              # Main pilot script
+│   ├── deepeval_metrics.py       # Custom GEval metrics
+│   ├── data_adapter.py           # Backend data loader
+│   ├── comparison.py             # Comparison & reporting
+│   └── README.md                 # Pilot documentation
 ├── main.py                       # Basic test examples
 ├── pyproject.toml                # Poetry dependencies
 ├── .env.example                  # Environment variables template
@@ -47,6 +53,11 @@ poetry run pytest main.py -v
 poetry run python playground/single_turn_example.py
 ```
 
+**Migration Pilot (validate DeepEval vs custom judge):**
+```bash
+poetry run python migration_pilot/run_pilot.py --test-dir <path-to-backend-test-output> --limit 5
+```
+
 ## What's Inside
 
 ### Main Examples (`main.py`)
@@ -63,6 +74,16 @@ Comprehensive single-turn evaluation examples demonstrating:
 - Batch evaluation from JSON
 
 See [`playground/README.md`](playground/README.md) for details.
+
+### Migration Pilot (`migration_pilot/`)
+
+Validates whether DeepEval can replicate auto-scan backend evaluation results:
+- Loads existing backend test data (golden answers, RAG answers, LLM judge results)
+- Evaluates with custom GEval metrics matching 4 boolean indicators
+- Compares DeepEval vs custom judge results
+- Generates comprehensive reports (console + JSON + markdown)
+
+See [`migration_pilot/README.md`](migration_pilot/README.md) for usage.
 
 ### Source (`src/`)
 
@@ -115,6 +136,7 @@ assert_test(test_case, [metric1, metric2])
 
 - **[CLAUDE.md](CLAUDE.md)**: Detailed project architecture and DeepEval usage patterns
 - **[playground/README.md](playground/README.md)**: Playground documentation
+- **[migration_pilot/README.md](migration_pilot/README.md)**: Migration pilot guide
 - **[DeepEval Docs](https://deepeval.com/docs/getting-started)**: Official documentation
 
 ## Use Cases
@@ -129,4 +151,5 @@ This POC helps evaluate:
 1. Explore the playground examples
 2. Add your own test cases in `playground/data/sample_test_cases.json`
 3. Experiment with custom GEval criteria
-4. Review migration strategy for existing test suites (see CLAUDE.md)
+4. **Run the migration pilot** to validate DeepEval on your real test data
+5. Review migration strategy for existing test suites (see CLAUDE.md)

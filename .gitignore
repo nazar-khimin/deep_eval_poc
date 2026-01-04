@@ -39,3 +39,6 @@ htmlcov/
 # Poetry
 .venv/
 poetry.toml
+
+# Migration Pilot
+migration_pilot/output/
