@@ -57,6 +57,113 @@ The project structure:
 
 - **Assertion Pattern**: Tests use `assert_test(test_case, [metrics])` to validate LLM outputs against defined metrics.
 
+## Migration Pilot
+
+The `migration_pilot/` package validates whether DeepEval can replicate the evaluation logic from the auto-scan backend's custom LLM judge.
+
+### Purpose
+
+- **Goal**: Determine if DeepEval's custom GEval metrics can achieve the same evaluation results as the existing custom LLM judge
+- **Approach**: Load real backend test data, evaluate with DeepEval, compare results side-by-side
+- **Output**: Comprehensive reports showing agreement rates and disagreements
+
+### Structure
+
+```
+migration_pilot/
+├── data_adapter.py           # Loads backend JSON files (golden, RAG, evaluations)
+├── deepeval_metrics.py       # Custom GEval metrics matching 4 backend boolean indicators
+├── comparison.py             # Comparison logic and report generation
+├── run_pilot.py              # Main execution script
+└── README.md                 # Detailed usage guide
+```
+
+### Custom GEval Metrics
+
+Four metrics replicate the backend's evaluation criteria:
+
+1. **`is_question_answered`**: Determines if the answer addresses all significant parts of the question
+   - Handles multi-part questions (all parts must be addressed)
+   - Special case: "Document does not provide X but specifies Y" = answered
+
+2. **`requires_additional_information`**: Detects if answer explicitly requests more info from the user
+   - True only if answer asks user for details ("please provide", "I need", etc.)
+   - False if answer simply states information is not in document
+
+3. **`is_speculative`**: Identifies hypothetical or inferential language
+   - True if uses hedging words: "might", "could", "seems", "possibly", "probably"
+   - False if strictly reports facts or states document lacks information
+
+4. **`is_confident`**: Analyzes if answer is phrased assertively
+   - True if direct/assertive: "Yes, X is...", "The document states..."
+   - False if uncertain/hedging: "It seems like", "I think", "maybe"
+
+**Composite Metric**: `comprehensive_answer`
+```python
+comprehensive_answer = (
+    is_question_answered AND
+    NOT requires_additional_information AND
+    NOT is_speculative AND
+    is_confident
+)
+```
+
+### Running the Pilot
+
+```bash
+poetry run python migration_pilot/run_pilot.py \
+    --test-dir /path/to/auto-scan-backend/tests/ai_chat_evaluation_tests/test_output/1764025492 \
+    --limit 10 \
+    --threshold 0.5
+```
+
+**Arguments:**
+- `--test-dir`: Path to backend test_output/<timestamp>/ directory (required)
+- `--limit`: Number of test cases to evaluate (default: all)
+- `--threshold`: Metric threshold for True/False (default: 0.5)
+- `--output-dir`: Output directory (default: migration_pilot/output)
+
+### Output Files
+
+1. **Console**: Real-time progress and summary statistics
+2. **JSON** (`deepeval_results_<timestamp>.json`): Raw evaluation results
+3. **JSON** (`comparison_<timestamp>.json`): Comparison statistics
+4. **Markdown** (`comparison_report_<timestamp>.md`): Human-readable report
+
+### Interpreting Results
+
+**Agreement Rate Thresholds:**
+- **≥90%**: Excellent - proceed with migration
+- **70-90%**: Good - review disagreements, fine-tune GEval criteria
+- **<70%**: Significant differences - refine metrics or keep custom judge
+
+**Common Adjustments:**
+- Low agreement on specific metric → Review GEval criteria in `deepeval_metrics.py`
+- Threshold too sensitive → Adjust `--threshold` parameter (try 0.4 or 0.6)
+- Systematic disagreements → May indicate fundamental differences in evaluation philosophy
+
+### Fine-Tuning Metrics
+
+Edit `migration_pilot/deepeval_metrics.py` to adjust:
+
+```python
+def create_is_speculative_metric(threshold: float = 0.5) -> GEval:
+    return GEval(
+        name="is_speculative",
+        criteria=(
+            # Modify criteria text here to match your exact requirements
+            "Determine whether the ANSWER uses assumptions..."
+        ),
+        evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT],
+        threshold=threshold,
+        evaluation_steps=[
+            # Add or modify evaluation steps
+            "Search for speculative/hedging words",
+            "..."
+        ]
+    )
+```
+
 ## Adding New Tests
 
 When adding new evaluation tests, follow this pattern:
