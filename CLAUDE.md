@@ -15,9 +15,15 @@ poetry install
 # Activate the virtual environment
 poetry shell
 
-# Set OpenAI API key (required for DeepEval metrics)
-export OPENAI_API_KEY="your-api-key"
+# Create .env file from example and add your API key
+cp .env.example .env
+# Edit .env and add your OPENAI_API_KEY
 ```
+
+**Environment Variables:**
+- Copy `.env.example` to `.env`
+- Add your `OPENAI_API_KEY` (required for DeepEval metrics)
+- Environment variables are loaded automatically via `python-dotenv`
 
 ## Running Tests
 
@@ -34,7 +40,13 @@ poetry run pytest main.py::test_answer_relevancy -v
 
 ## Architecture
 
-The project currently contains a single test file (`main.py`) that demonstrates DeepEval usage:
+The project structure:
+
+- **Constants Management** (`src/constants.py`): Centralized environment configuration
+  - Uses frozen dataclasses for immutable constants
+  - Automatically loads from `.env` file via `python-dotenv`
+  - Singleton instance `const` provides access to configuration
+  - Example usage: `from src.constants import const` then access `const.OPENAI_API_KEY`
 
 - **Test Structure**: Tests use `LLMTestCase` objects that contain:
   - `input`: The query or prompt sent to the LLM
